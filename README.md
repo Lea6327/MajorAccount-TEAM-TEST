@@ -59,6 +59,13 @@ File: `sql/queries.sql`
 * **Query B:** matters without a **Title** certificate (last 30 days)
 * **Index:** `Certificates(type, created_at, order_id)` to speed Query B join/filter
 
+* Run the demo with SQLite
+* sqlite3 :memory: < sql/queries-demo.sql
+* Expected sample output
+* Query A: M-1 | 2
+* Query B: M-2, M-3
+
+
 ## Assumptions
 
 * Prefer `formattedAddress`; else compose `street, suburb state postcode`
