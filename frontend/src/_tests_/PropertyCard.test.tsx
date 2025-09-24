@@ -12,7 +12,7 @@ const base: InternalProperty = {
   sourceTrace: {
     provider: "VIC-DDP",
     requestId: "REQ-12345",
-    receivedAt: "2025-08-30T03:12:45Z",
+    receivedAt: "2025-08-30T03:12:45Z",git commit -m "Fix PropertyCard tests
   },
 };
 
