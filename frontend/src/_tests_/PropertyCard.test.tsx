@@ -1,9 +1,9 @@
-// frontend/src/_tests_/PropertyCard.test.tsx
-import React from "react";
-import { render, screen, within, waitFor } from "@testing-library/react";
+
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import PropertyCard, { type InternalProperty } from "../components/PropertyCard";
 
+// Base fixture used for all test cases
 const base: InternalProperty = {
   fullAddress: "10 Example St, Carlton VIC 3053",
   lotPlan: { lot: "12", plan: "PS123456" },
@@ -17,71 +17,99 @@ const base: InternalProperty = {
 };
 
 describe("PropertyCard", () => {
-  test("opens the modal and closes it with Escape", async () => {
-    render(<PropertyCard initial={base} />);
+  it("opens the modal and closes it with Escape", async () => {
     const user = userEvent.setup();
+    render(<PropertyCard initial={base} />);
 
-    // open
+    // Act: open modal
     await user.click(screen.getByRole("button", { name: /edit/i }));
+    // Assert: modal is present
     expect(screen.getByRole("dialog")).toBeInTheDocument();
 
-    // close with ESC
+    // Act: close modal with Escape key
     await user.keyboard("{Escape}");
+    // Assert: modal is removed from DOM
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  test("shows validation errors for invalid inputs", async () => {
-    render(<PropertyCard initial={base} />);
+  it("masks non-digits, caps length (vol<=6, fol<=5) and previews status", async () => {
     const user = userEvent.setup();
+    render(<PropertyCard initial={base} />);
 
+    // Open modal
     await user.click(screen.getByRole("button", { name: /edit/i }));
     const dialog = screen.getByRole("dialog");
 
-    const vol = within(dialog).getByLabelText(/^volume$/i);
-    const fol = within(dialog).getByLabelText(/^folio$/i);
+    // Get inputs
+    const volInput = within(dialog).getByRole("textbox", { name: /^volume$/i });
+    const folInput = within(dialog).getByRole("textbox", { name: /^folio$/i });
 
-    await user.click(vol);
-    await user.type(vol, "1234567"); // invalid: > 6 digits
-    await user.click(fol);
-    await user.type(fol, "abc");     // invalid: non-digits
+    // Volume: strips non-digits and caps at 6 characters
+    await user.clear(volInput);
+    await user.type(volInput, "abc1-2.3/4567"); // after mask -> "123456"
+    expect(volInput).toHaveValue("123456");
 
-    await user.click(within(dialog).getByRole("button", { name: /confirm/i }));
+    // Folio: strips non-digits and caps at 5 characters
+    await user.clear(folInput);
+    await user.type(folInput, "9a8b7c6"); // after mask -> "9876"
+    expect(folInput).toHaveValue("9876");
+    await user.type(folInput, "54"); // after mask -> "98765"
+    expect(folInput).toHaveValue("98765");
 
-    expect(await within(dialog).findByText(/Volume must be 1–6 digits/i)).toBeInTheDocument();
-    expect(within(dialog).getByText(/Folio must be 1–5 digits/i)).toBeInTheDocument();
+    // Status preview should change to KnownVolFol
+    expect(
+      within(dialog).getAllByText((_, node) =>
+        node?.textContent?.match(/Will set status to:\s*KnownVolFol/i) !== null
+      )[0]
+    ).toBeInTheDocument();
+
+    // Validation messages should not appear due to masking
+    expect(
+      within(dialog).queryByText(/Volume must be 1–6 digits/i)
+    ).toBeNull();
+    expect(
+      within(dialog).queryByText(/Folio must be 1–5 digits/i)
+    ).toBeNull();
   });
 
-  test("confirm updates card values and status", async () => {
-    render(<PropertyCard initial={base} />);
+  it("confirms updates and reflects new values on the card", async () => {
     const user = userEvent.setup();
+    render(<PropertyCard initial={base} />);
 
+    // Open modal
     await user.click(screen.getByRole("button", { name: /edit/i }));
     const dialog = screen.getByRole("dialog");
 
-    const vol = within(dialog).getByLabelText(/^volume$/i);
-    const fol = within(dialog).getByLabelText(/^folio$/i);
+    // Fill inputs with overlong values (mask will truncate them)
+    const volInput = within(dialog).getByRole("textbox", { name: /^volume$/i });
+    const folInput = within(dialog).getByRole("textbox", { name: /^folio$/i });
 
-    await user.click(vol);
-    await user.clear(vol);
-    await user.type(vol, "123456");
+    await user.clear(volInput);
+    await user.type(volInput, "1234567"); // becomes "123456"
+    await user.clear(folInput);
+    await user.type(folInput, "123456"); // becomes "12345"
 
-    await user.click(fol);
-    await user.clear(fol);
-    await user.type(fol, "12345");
-
+    // Confirm changes
     await user.click(within(dialog).getByRole("button", { name: /confirm/i }));
 
-    // wait for modal unmount (state updates are async)
+    // Wait until modal is removed from DOM
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
 
-    // assert row text via container (text is split across nodes)
-    const vfRow = screen.getByText(/Volume\/Folio:/i).parentElement as HTMLElement;
-    expect(vfRow).toHaveTextContent(/Volume\/Folio:\s*123456\s*\/\s*12345/i);
+    // Card should reflect new values and KnownVolFol status
+    expect(
+      screen.getAllByText((_, node) =>
+        node?.textContent?.match(/Volume\/Folio:\s*123456\s*\/\s*12345/i) !== null
+      )[0]
+    ).toBeInTheDocument();
 
-    const statusRow = screen.getByText(/Status:/i).parentElement as HTMLElement;
-    expect(statusRow).toHaveTextContent(/KnownVolFol/i);
+    expect(
+      screen.getAllByText(/KnownVolFol/i)[0]
+    ).toBeInTheDocument();
   });
 });
+
+
+
 
