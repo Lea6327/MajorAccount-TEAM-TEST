@@ -19,7 +19,7 @@ dotnet run
 
 ```bash
 cd frontend
-npm i
+npm install
 # package.json should contain: "proxy": "http://localhost:5124"   # match API port
 npm start
 ```
