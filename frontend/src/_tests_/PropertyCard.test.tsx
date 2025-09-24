@@ -1,4 +1,4 @@
-
+// src/_tests_/PropertyCard.test.tsx
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import PropertyCard, { type InternalProperty } from "../components/PropertyCard";
@@ -12,7 +12,7 @@ const base: InternalProperty = {
   sourceTrace: {
     provider: "VIC-DDP",
     requestId: "REQ-12345",
-    receivedAt: "2025-08-30T03:12:45Z",git commit -m "Fix PropertyCard tests
+    receivedAt: "2025-08-30T03:12:45Z",
   },
 };
 
@@ -109,6 +109,7 @@ describe("PropertyCard", () => {
     ).toBeInTheDocument();
   });
 });
+
 
 
 
