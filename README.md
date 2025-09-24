@@ -86,10 +86,27 @@ File: `sql/queries.sql`
 
 ## Time spent
 
-~3 hours core build + brief polish — exact timestamps visible in Git commit history (GitHub “Commits” tab or git log).
+Work began 11:10 am and wrapped up ~3:00 pm, including a short lunch and restroom breaks.
+Net build time: ~3 hours. Git commit history shows detailed timestamps.
 
 ## AI usage & verification
+I used ChatGPT for:
 
-AI tools used
+Drafting initial TypeScript types and Jest test scaffolding
 
-ChatGPT for drafts and ideas; final code and queries were reviewed, adjusted, and verified with automated tests and manual checks.
+Proposing SQL query structure
+
+Brainstorming validation rules
+
+I reviewed and refined all generated drafts manually.
+Verification included:
+
+Backend unit tests for NormalizeProperty
+
+Frontend component tests for <PropertyCard /> (modal, validation, confirm)
+
+Manual curl runs against API
+
+SQLite demo output
+
+AI support was limited to boilerplate; all final logic was confirmed against the spec.
