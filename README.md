@@ -3,7 +3,7 @@
 ## 🔗 Repository
 GitHub: [Lea6327/MajorAccount-TEAM-TEST](https://github.com/Lea6327/MajorAccount-TEAM-TEST)
 
-I built a minimal full-stack slice for the Purchase Team test: a **.NET 8** API that normalizes property data and (optionally) persists it, plus a **React + TypeScript** UI with an accessible edit modal. Client & server share the same validation (Volume 1–6 digits, Folio 1–5 digits). The repo includes unit/component tests and concise SQL queries.
+I built a minimal full-stack slice: a **.NET 8** API that normalizes property data and (optionally) persists it, plus a **React + TypeScript** UI with an accessible edit modal. Client & server share the same validation (Volume 1–6 digits, Folio 1–5 digits). The repo includes unit/component tests and concise SQL queries.
 
 ## Run (local)
 
